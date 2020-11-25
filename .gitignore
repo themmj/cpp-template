@@ -1,0 +1,10 @@
+# build artifacts
+bin/
+build/
+
+# generated stuff
+coverage/
+doc/*/
+
+# OSX files
+.DS_Store
