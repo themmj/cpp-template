@@ -50,6 +50,7 @@ add_custom_target(clean-gcno
 add_dependencies(test clean-gcno ${BINARY}-test)
 
 add_custom_target(coverage
+    COMMAND mkdir -p ./test/coverage
     COMMAND gcovr -r . -f src/ -e "\'(.+\/)?(main|.+_test)\.cpp\'" --branches --html --html-details -o ${CMAKE_SOURCE_DIR}/test/coverage/coverage.html
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
