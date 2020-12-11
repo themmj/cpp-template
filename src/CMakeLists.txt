@@ -3,6 +3,10 @@ set (SRC_FILES
     math/math.cpp
 )
 
+set (INCL_DIRS
+    ${CMAKE_SOURCE_DIR}/third-party/spdlog/include
+)
+
 add_executable(${BINARY} ${SRC_FILES})
 
 set_target_properties(
@@ -11,12 +15,18 @@ set_target_properties(
     # set output to bin dir
     RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
 )
+target_include_directories(${BINARY} PUBLIC
+    ${INCL_DIRS}
+)
 
 add_library(${BINARY}-lib STATIC EXCLUDE_FROM_ALL ${SRC_FILES})
 
 target_compile_options(${BINARY}-lib PUBLIC
     -O0
     --coverage
+)
+target_include_directories(${BINARY}-lib PUBLIC
+    ${INCL_DIRS}
 )
 
 add_custom_target(run

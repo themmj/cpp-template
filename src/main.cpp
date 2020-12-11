@@ -1,8 +1,17 @@
 #include <iostream>
+#include <memory>
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 #include "math/math.h"
 
 int main(int argc, char** argv) {
-    std::cout << Math::add<std::string>("Hello", " World\n");
-    std::cout << Math::add(34, 35);
+    spdlog::set_pattern("%^[%T][%t] %n: %v%$");
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("APP");
+    logger->set_level(spdlog::level::trace);
+
+    logger->info("Adding strings: {0}", Math::add<std::string>("Hello", " World"));
+    logger->info("Adding numbers: {0}", Math::add(34, 35));
+
     return 0;
 }
