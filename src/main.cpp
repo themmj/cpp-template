@@ -1,11 +1,12 @@
 #include <iostream>
 #include <memory>
+#include "spdlog/logger.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "math/math.h"
 
-int main(int argc, char** argv) {
+int main() {
     spdlog::set_pattern("%^[%T][%t] %n: %v%$");
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("APP");
     logger->set_level(spdlog::level::trace);

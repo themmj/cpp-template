@@ -1,5 +1,5 @@
 #### Gtest
-add_subdirectory("${PROJECT_SOURCE_DIR}/third-party/googletest" "third-party/googletest")
+add_extern_directory(googletest)
 
 mark_as_advanced(
     BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
@@ -16,13 +16,12 @@ set_target_properties(gmock_main PROPERTIES FOLDER extern)
 add_executable(${BINARY}-test main_test.cpp)
 
 target_include_directories(${BINARY}-test PUBLIC
-    ${CMAKE_SOURCE_DIR}/src
+    ${INCLUDE_DIRS}
 )
 target_link_libraries(${BINARY}-test
     gtest
     gmock
     gtest_main
-    gcov
     ${BINARY}-lib
 )
 
@@ -34,8 +33,12 @@ set_target_properties(
 
 target_compile_options(
     ${BINARY}-test PUBLIC
-    -O0
-    --coverage
+    ${TEST_COMPILE_OPTIONS}
+)
+
+target_link_options(
+    ${BINARY}-test PUBLIC
+    ${TEST_LINK_OPTIONS}
 )
 
 add_custom_target(test
@@ -43,11 +46,14 @@ add_custom_target(test
 )
 
 add_custom_target(clean-gcno
-    COMMAND find . -name "\"*.gcda\"" -type f -delete
+    COMMAND find . -name "\"*.gcno\"" -type f -delete
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-add_dependencies(test clean-gcno ${BINARY}-test)
+add_custom_target(clean-gcda
+    COMMAND find . -name "\"*.gcda\"" -type f -delete
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
 
 add_custom_target(coverage
     COMMAND mkdir -p ./test/coverage
