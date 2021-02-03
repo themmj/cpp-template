@@ -1,5 +1,5 @@
 #include <sstream>
-#include "math.h"
+#include "math.hpp"
 
 namespace Math {
     template<>
