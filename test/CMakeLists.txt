@@ -1,48 +1,31 @@
-#### Gtest
-add_extern_directory(googletest)
-
-mark_as_advanced(
-    BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
-    gmock_build_tests gtest_build_samples gtest_build_tests
-    gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+add_executable(${TEST_BIN_NAME}
+    src/main.cpp
 )
 
-set_target_properties(gtest PROPERTIES FOLDER extern)
-set_target_properties(gtest_main PROPERTIES FOLDER extern)
-set_target_properties(gmock PROPERTIES FOLDER extern)
-set_target_properties(gmock_main PROPERTIES FOLDER extern)
-
-#### TestBuild
-add_executable(${BINARY}-test main_test.cpp)
-
-target_include_directories(${BINARY}-test PUBLIC
-    ${INCLUDE_DIRS}
-)
-target_link_libraries(${BINARY}-test
-    gtest
-    gmock
-    gtest_main
-    ${BINARY}-lib
+target_include_directories(${TEST_BIN_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set_target_properties(
-   ${BINARY}-test PROPERTIES
+# add gtest
+include(${THIRD_PARTY_DIR}/FetchGTest.cmake)
 
-   RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
+target_link_libraries(${TEST_BIN_NAME}
+    PRIVATE
+    ${LIB_NAME}
+    GTest::gtest
+    GTest::gtest_main
 )
 
-target_compile_options(
-    ${BINARY}-test PUBLIC
-    ${TEST_COMPILE_OPTIONS}
+add_test(
+    NAME unit-tests
+    COMMAND ${TEST_BIN_NAME}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
-target_link_options(
-    ${BINARY}-test PUBLIC
-    ${TEST_LINK_OPTIONS}
-)
-
-add_custom_target(test
-    COMMAND ${BIN_DIR}/${BINARY}-test
+add_custom_target(run-tests-for-coverage
+    COMMAND ${TEST_BIN_NAME}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_custom_target(clean-gcno
@@ -55,10 +38,12 @@ add_custom_target(clean-gcda
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
+add_dependencies(run-tests-for-coverage clean-gcda)
+
 add_custom_target(coverage
-    COMMAND mkdir -p ./test/coverage
-    COMMAND gcovr -r . -f src/ -e "\'(.+\/)?(main|.+_test)\.cpp\'" --branches --html --html-details -o ${CMAKE_SOURCE_DIR}/test/coverage/coverage.html --gcov-executable ${GCOVEXEC}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/coverage
+    COMMAND gcovr -r ${CMAKE_SOURCE_DIR} . --html --html-details -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage/coverage.html --gcov-executable ${GCOVEXEC}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src
 )
-add_dependencies(coverage test)
+add_dependencies(coverage run-tests-for-coverage)
 
