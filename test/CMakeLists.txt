@@ -38,7 +38,7 @@ add_custom_target(clean-gcda
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-add_dependencies(run-tests-for-coverage clean-gcda)
+add_dependencies(run-tests-for-coverage clean-gcda ${TEST_BIN_NAME})
 
 add_custom_target(coverage
     COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/coverage
