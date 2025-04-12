@@ -57,3 +57,4 @@ add_custom_target(run
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
+add_dependencies(run ${BIN_NAME})
