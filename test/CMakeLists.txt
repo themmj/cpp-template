@@ -40,10 +40,14 @@ add_custom_target(clean-gcda
 
 add_dependencies(run-tests-for-coverage clean-gcda ${TEST_BIN_NAME})
 
-add_custom_target(coverage
-    COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/coverage
-    COMMAND gcovr -r ${CMAKE_SOURCE_DIR} . --html --html-details -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage/coverage.html --gcov-executable ${GCOVEXEC}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src
-)
-add_dependencies(coverage run-tests-for-coverage)
-
+find_program(GCOVR_FOUND gcovr)
+if (GCOVR_FOUND)
+    add_custom_target(coverage
+        COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/coverage
+        COMMAND gcovr -r ${CMAKE_SOURCE_DIR} . --html --html-details -o ${CMAKE_CURRENT_SOURCE_DIR}/coverage/coverage.html --gcov-executable ${GCOVEXEC}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src
+    )
+    add_dependencies(coverage run-tests-for-coverage)
+else()
+    message(WARNING "gcovr not found, coverage target will not be available")
+endif()
